@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>BTR Ultra IDE</title>
+
+<style>
+body{
+    margin:0;
+    background:#0f172a;
+    font-family:Arial;
+    color:white;
+}
+.topbar{
+    background:#1e293b;
+    padding:12px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+.logo{
+    font-weight:bold;
+}
+button, select{
+    background:#6366f1;
+    border:none;
+    color:white;
+    padding:6px 12px;
+    border-radius:5px;
+    margin-left:8px;
+}
+button:hover{background:#4f46e5;}
+#editor{height:82vh;}
+.status{
+    background:#111827;
+    padding:10px 15px;
+    font-size:14px;
+}
+.ok{color:#22c55e;}
+.err{color:#ef4444;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="logo">BTR Ultra Secure IDE</div>
+    <div>
+        <select id="scriptType">
+            <option value="normal">Normal Script</option>
+            <option value="wait">Wait Script</option>
+        </select>
+        <button onclick="validate()">Validate</button>
+    </div>
+</div>
+
+<div id="editor"></div>
+<div id="status" class="status ok">Ready.</div>
+
+<script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
+<script>
+require.config({ paths:{ vs:"https://unpkg.com/monaco-editor@0.44.0/min/vs" }});
+
+let editor;
+
+require(["vs/editor/editor.main"], function(){
+
+    monaco.languages.register({ id:"btr" });
+
+    monaco.languages.setMonarchTokensProvider("btr",{
+        tokenizer:{
+            root:[
+                [/\b(on|wait|btr|if|else|for)\b/,"keyword"],
+                [/\b(bot|user)\b/,"type"],
+                [/\b(sendMessage|wait4Msg|get|set|deleteMessage)\b/,"function"],
+                [/".*?"/,"string"],
+                [/\b\d+\b/,"number"],
+                [/==|!=|>|<|&&|\+/,"operator"]
+            ]
+        }
+    });
+
+    monaco.editor.defineTheme("btrTheme",{
+        base:"vs-dark",
+        inherit:true,
+        rules:[
+            {token:"keyword",foreground:"c084fc"},
+            {token:"type",foreground:"38bdf8"},
+            {token:"function",foreground:"22c55e"},
+            {token:"string",foreground:"facc15"}
+        ],
+        colors:{
+            "editor.background":"#0f172a"
+        }
+    });
+
+    editor = monaco.editor.create(document.getElementById("editor"),{
+        value:`btr res = 0;
+
+if(res == 0){
+    bot.sendMessage("Hello");
+}`,
+        language:"btr",
+        theme:"btrTheme",
+        automaticLayout:true,
+        minimap:{enabled:false}
+    });
+
+});
+
+function validate(){
+
+    const code = editor.getValue();
+    const type = document.getElementById("scriptType").value;
+    const status = document.getElementById("status");
+
+    monaco.editor.setModelMarkers(editor.getModel(),"owner",[]);
+
+    try{
+
+        simpleValidator(code,type);
+
+        status.innerHTML="✔ Syntax valid";
+        status.className="status ok";
+
+    }catch(e){
+
+        status.innerHTML="❌ "+e.message;
+        status.className="status err";
+
+        monaco.editor.setModelMarkers(editor.getModel(),"owner",[{
+            startLineNumber:e.line || 1,
+            startColumn:1,
+            endLineNumber:e.line || 1,
+            endColumn:1,
+            message:e.message,
+            severity:monaco.MarkerSeverity.Error
+        }]);
+    }
+}
+
+function simpleValidator(code,type){
+
+    let open=0;
+    const lines=code.split("\n");
+
+    lines.forEach((line,i)=>{
+        for(let c of line){
+            if(c=="{")open++;
+            if(c=="}")open--;
+        }
+        if(open<0){
+            throw {message:"Unexpected closing brace",line:i+1};
+        }
+    });
+
+    if(open!==0){
+        throw {message:"Missing closing brace",line:lines.length};
+    }
+
+    const blocked=["system(","include(","require(","eval(","exec(","shell_exec"];
+    for(let w of blocked){
+        if(code.includes(w)){
+            throw {message:"Unauthorized keyword used",line:1};
+        }
+    }
+
+    if(type=="wait" && !code.includes("on wait")){
+        throw {message:"Wait script must contain 'on wait { }' block",line:1};
+    }
+
+}
+</script>
+</body>
+</html>
