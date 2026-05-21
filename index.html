@@ -1,174 +1,873 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+
 <meta charset="UTF-8">
-<title>BTR Ultra IDE--</title>
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Botroid- Editor</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-body{
+
+*{
     margin:0;
-    background:#0f172a;
-    font-family:Arial;
-    color:white;
+    padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
 }
+
+html,
+body{
+    width:100%;
+    height:100%;
+}
+
+body{
+
+    background:
+    radial-gradient(circle at top left,#0ea5e920 0%,transparent 30%),
+    radial-gradient(circle at bottom right,#2563eb20 0%,transparent 30%),
+    #050816;
+
+    font-family:'Inter',sans-serif;
+
+    color:#fff;
+
+    overflow:hidden;
+}
+
+/* TOPBAR */
+
 .topbar{
-    background:#1e293b;
-    padding:12px 20px;
+
+    width:100%;
+
+    height:72px;
+
+    background:rgba(5,8,22,.88);
+
+    border-bottom:1px solid rgba(255,255,255,.06);
+
+    backdrop-filter:blur(18px);
+
     display:flex;
-    justify-content:space-between;
     align-items:center;
+    justify-content:space-between;
+
+    padding:0 18px;
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    z-index:999;
 }
-.logo{
-    font-weight:bold;
+
+.top-left{
+
+    display:flex;
+    flex-direction:column;
 }
-button, select{
-    background:#6366f1;
-    border:none;
-    color:white;
-    padding:6px 12px;
-    border-radius:5px;
-    margin-left:8px;
+
+.cmd-name{
+
+    font-size:20px;
+    font-weight:800;
 }
-button:hover{background:#4f46e5;}
-#editor{height:82vh;}
-.status{
-    background:#111827;
-    padding:10px 15px;
+
+.cmd-file{
+
+    margin-top:4px;
+
     font-size:14px;
+
+    color:#7c8aa5;
 }
-.ok{color:#22c55e;}
-.err{color:#ef4444;}
+
+/* ACTIONS */
+
+.actions{
+
+    display:flex;
+    align-items:center;
+
+    gap:10px;
+}
+
+.btn{
+
+    height:44px;
+
+    padding:0 18px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:rgba(255,255,255,.05);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    color:#fff;
+
+    font-size:14px;
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    text-decoration:none;
+}
+
+.btn:hover{
+    background:rgba(255,255,255,.08);
+}
+
+.save-btn{
+
+    background:
+    linear-gradient(
+        135deg,
+        #06b6d4,
+        #2563eb
+    );
+
+    border:none;
+}
+
+/* MAIN */
+
+.main{
+
+    width:100%;
+
+    height:100dvh;
+
+    padding-top:72px;
+
+    display:flex;
+    flex-direction:column;
+
+    position:relative;
+}
+
+/* ALERTS */
+
+.alert{
+
+    width:calc(100% - 20px);
+
+    margin:0 10px;
+
+    padding:12px 16px;
+
+    font-size:14px;
+    font-weight:600;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    position:fixed;
+
+    top:130px;
+    left:0;
+
+    border-radius:14px;
+
+    z-index:999;
+
+    backdrop-filter:blur(14px);
+
+    animation:fadeAlert .25s ease;
+}
+
+.success{
+    background:rgba(34,197,94,.12);
+    color:#86efac;
+}
+
+.error{
+    background:rgba(239,68,68,.12);
+    color:#fca5a5;
+}
+
+/* EDITOR */
+
+.editor-wrap{
+
+    flex:1;
+
+    width:100%;
+
+    overflow:hidden;
+}
+
+#editor{
+    width:100%;
+    height:100%;
+}
+
+.monaco-editor,
+.monaco-editor .overflow-guard{
+
+    -webkit-user-select:text !important;
+    user-select:text !important;
+
+    -webkit-touch-callout:default !important;
+
+    touch-action:auto !important;
+}
+
+.monaco-editor .suggest-preview-text{
+
+    color:#ef4444 !important;
+
+    opacity:1 !important;
+}
+
+.monaco-editor .ghost-text{
+
+    color:#ef4444 !important;
+
+    opacity:1 !important;
+}
+
+/* STATUS */
+
+.statusbar{
+
+    width:100%;
+
+    height:44px;
+
+    background:#020617;
+
+    border-top:1px solid rgba(255,255,255,.06);
+
+    display:flex;
+    align-items:center;
+
+    padding:0 16px;
+
+    font-size:13px;
+
+    color:#7c8aa5;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+    .topbar{
+
+        height:auto;
+
+        padding:14px;
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:14px;
+    }
+
+    .alert{
+        top:130px;
+    }
+
+    .main{
+        padding-top:130px;
+    }
+
+    .actions{
+
+        width:100%;
+
+        display:grid;
+
+        grid-template-columns:
+        repeat(3,1fr);
+
+        gap:10px;
+    }
+
+    .btn{
+
+        width:100%;
+
+        height:42px;
+
+        font-size:13px;
+
+        padding:0;
+    }
+
+    .cmd-name{
+        font-size:18px;
+    }
+}
+
+@keyframes fadeAlert{
+
+    from{
+        opacity:0;
+        transform:translateY(-8px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
 </style>
+
 </head>
 <body>
 
+<form method="POST" id="saveForm">
+
 <div class="topbar">
-    <div class="logo">BTR Ultra Secure IDE</div>
-    <div>
-        <select id="scriptType">
-            <option value="normal">Normal Script</option>
-            <option value="wait">Wait Script</option>
-        </select>
-        <button onclick="validate()">Validate</button>
+
+    <div class="top-left">
+
+        <div class="cmd-name">
+            ⚡ Botroid Editor
+        </div>
+
+        <div class="cmd-file">
+            <?php echo htmlspecialchars(str_replace('_','/',$cmd)); ?>
+        </div>
+
     </div>
+
+    <div class="actions">
+
+        <a
+        href="/dashboard/editbot?id=<?php echo $botid; ?>&go=cmd"
+        class="btn">
+
+            Home
+
+        </a>
+
+        <button
+        type="button"
+        class="btn"
+        onclick="formatCode()">
+
+            Format
+
+        </button>
+
+        <button
+        type="submit"
+        name="save_code"
+        class="btn save-btn"
+        onclick="prepareSave()">
+
+            Save
+
+        </button>
+
+    </div>
+
 </div>
 
-<div id="editor"></div>
-<div id="status" class="status ok">Ready.</div>
+<div class="main">
+
+    <div class="editor-wrap">
+
+        <div id="editor"></div>
+
+    </div>
+
+    <div
+    class="statusbar"
+    id="statusbar">
+
+        Ready
+
+    </div>
+
+</div>
+
+<textarea
+name="code"
+id="hiddenCode"
+style="display:none;"></textarea>
+
+</form>
 
 <script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
+
 <script>
-require.config({ paths:{ vs:"https://unpkg.com/monaco-editor@0.44.0/min/vs" }});
+
+require.config({
+    paths:{
+        vs:"https://unpkg.com/monaco-editor@0.44.0/min/vs"
+    }
+});
 
 let editor;
 
+let pressTimer;
+
 require(["vs/editor/editor.main"], function(){
 
-    monaco.languages.register({ id:"btr" });
+    monaco.languages.register({
+        id:"btr"
+    });
 
     monaco.languages.setMonarchTokensProvider("btr",{
         tokenizer:{
             root:[
-                [/\b(on|wait|btr|if|else|for)\b/,"keyword"],
-                [/\b(bot|user)\b/,"type"],
-                [/\b(sendMessage|wait4Msg|get|set|deleteMessage)\b/,"function"],
+                [/\b(if|else|for|while|function|return|wait|on|btr)\b/,"keyword"],
+                [/\b(sendMessage|get|set|reply)\b/,"function"],
                 [/".*?"/,"string"],
-                [/\b\d+\b/,"number"],
-                [/==|!=|>|<|&&|\+/,"operator"]
+                [/\d+/,"number"]
             ]
         }
     });
 
-    monaco.editor.defineTheme("btrTheme",{
+    monaco.editor.defineTheme("botroidTheme",{
+
         base:"vs-dark",
+
         inherit:true,
+
         rules:[
-            {token:"keyword",foreground:"c084fc"},
-            {token:"type",foreground:"38bdf8"},
-            {token:"function",foreground:"22c55e"},
-            {token:"string",foreground:"facc15"}
+
+            {
+                token:"keyword",
+                foreground:"c084fc"
+            },
+
+            {
+                token:"function",
+                foreground:"22c55e"
+            },
+
+            {
+                token:"string",
+                foreground:"facc15"
+            },
+            
+            {
+                token:"number",
+                foreground:"22d3ee"
+            }
+
         ],
+
         colors:{
-            "editor.background":"#0f172a"
+            
+            "editor.background":"#050816",
+            
+            "editorGhostText.foreground":"#ef4444",
+            "editorGhostText.background":"#00000000",
+            
+            "editorSuggestWidget.selectedIconForeground":"#ef4444",
+            "editorSuggestWidget.focusHighlightForeground":"#ef4444",
+            
+            "editorSuggestWidget.foreground":"#ef4444",
+            "editorSuggestWidget.highlightForeground":"#ef4444",
+            "editorSuggestWidget.selectedForeground":"#ef4444"
         }
     });
 
-    editor = monaco.editor.create(document.getElementById("editor"),{
-        value:`btr res = 0;
+    editor =
+    monaco.editor.create(
 
-if(res == 0){
-    bot.sendMessage("Hello");
-}`,
-        language:"btr",
-        theme:"btrTheme",
-        automaticLayout:true,
-        minimap:{enabled:false}
+        document.getElementById("editor"),
+
+        {
+
+            value: "hello",
+
+            language:"btr",
+
+            theme:"botroidTheme",
+
+            automaticLayout:true,
+
+            minimap:{
+                enabled:window.innerWidth > 768
+            },
+
+            fontSize:
+            window.innerWidth <= 768
+            ? 13
+            : 15,
+
+            lineHeight:26,
+
+            smoothScrolling:true,
+
+            roundedSelection:true,
+
+            scrollBeyondLastLine:false,
+            
+            selectionClipboard:true,
+            
+            multiCursorModifier:"ctrlCmd",
+            
+            suggest:{
+                preview:false
+            },
+
+            inlineSuggest:{
+                enabled:false
+            }
+        
+        }
+    );
+
+    editor.onDidChangeModelContent(()=>{
+
+        document
+        .getElementById("statusbar")
+        .innerHTML =
+        "Editing...";
     });
+    
+/*
+|--------------------------------------------------------------------------
+| MOBILE COPY SUPPORT
+|--------------------------------------------------------------------------
+*/
+
+const editorElement =
+document.getElementById("editor");
+
+/*
+|--------------------------------------------------------------------------
+| LONG PRESS = SELECT ALL
+|--------------------------------------------------------------------------
+*/
+
+editorElement.addEventListener(
+
+    "touchstart",
+
+    function(){
+
+        pressTimer =
+        setTimeout(function(){
+
+            editor.focus();
+
+            editor.setSelection(
+
+                new monaco.Range(
+
+                    1,
+                    1,
+
+                    editor.getModel().getLineCount(),
+
+                    editor.getModel().getLineMaxColumn(
+
+                        editor.getModel().getLineCount()
+
+                    )
+
+                )
+
+            );
+
+            document
+            .getElementById("statusbar")
+            .innerHTML =
+            "Selected All";
+
+        },900);
+
+    },
+
+    {
+        passive:true
+    }
+
+);
+
+/*
+|--------------------------------------------------------------------------
+| STOP LONG PRESS
+|--------------------------------------------------------------------------
+*/
+
+editorElement.addEventListener(
+
+    "touchend",
+
+    function(){
+
+        clearTimeout(pressTimer);
+
+    },
+
+    {
+        passive:true
+    }
+
+);
+
+/*
+|--------------------------------------------------------------------------
+| DOUBLE TAP = SELECT WORD
+|--------------------------------------------------------------------------
+*/
+
+let lastTap = 0;
+
+editorElement.addEventListener(
+
+    "touchend",
+
+    function(){
+
+        const now = Date.now();
+
+        if(now - lastTap < 300){
+
+            editor.focus();
+
+            const position =
+            editor.getPosition();
+
+            const model =
+            editor.getModel();
+
+            const word =
+            model.getWordAtPosition(position);
+
+            if(word){
+
+                editor.setSelection(
+
+                    new monaco.Range(
+
+                        position.lineNumber,
+
+                        word.startColumn,
+
+                        position.lineNumber,
+
+                        word.endColumn
+
+                    )
+
+                );
+
+                document
+                .getElementById("statusbar")
+                .innerHTML =
+                "Word Selected";
+            }
+        }
+
+        lastTap = now;
+
+    },
+
+    {
+        passive:true
+    }
+
+);
+
+/*
+|--------------------------------------------------------------------------
+| NATIVE MOBILE COPY
+|--------------------------------------------------------------------------
+*/
+
+editor.updateOptions({
+
+    copyWithSyntaxHighlighting:false,
+
+    emptySelectionClipboard:true,
+
+    contextmenu:true,
+
+    quickSuggestions:true
+});
+
+
+
+
+
+editorElement.addEventListener(
+
+    "touchend",
+
+    function(){
+
+        clearTimeout(pressTimer);
+
+    }
+
+);
 
 });
 
-function validate(){
+/*
+|--------------------------------------------------------------------------
+| FORMAT
+|--------------------------------------------------------------------------
+*/
 
-    const code = editor.getValue();
-    const type = document.getElementById("scriptType").value;
-    const status = document.getElementById("status");
+function formatCode(){
 
-    monaco.editor.setModelMarkers(editor.getModel(),"owner",[]);
+    let code =
+    editor.getValue();
 
-    try{
+    /*
+    |--------------------------------------------------------------------------
+    | CLEAN EXTRA SPACES
+    |--------------------------------------------------------------------------
+    */
 
-        simpleValidator(code,type);
+    code =
+    code.replace(/\r/g,'');
 
-        status.innerHTML="✔ Syntax valid";
-        status.className="status ok";
+    code =
+    code.replace(/[ \t]+\n/g,'\n');
 
-    }catch(e){
+    code =
+    code.replace(/\n{3,}/g,"\n\n");
 
-        status.innerHTML="❌ "+e.message;
-        status.className="status err";
+    /*
+    |--------------------------------------------------------------------------
+    | FORMAT SYMBOLS
+    |--------------------------------------------------------------------------
+    */
 
-        monaco.editor.setModelMarkers(editor.getModel(),"owner",[{
-            startLineNumber:e.line || 1,
-            startColumn:1,
-            endLineNumber:e.line || 1,
-            endColumn:1,
-            message:e.message,
-            severity:monaco.MarkerSeverity.Error
-        }]);
-    }
-}
+    code =
+    code.replace(/\s*\{\s*/g," {\n");
 
-function simpleValidator(code,type){
+    code =
+    code.replace(/\s*\}\s*/g,"\n}\n");
 
-    let open=0;
-    const lines=code.split("\n");
+    code =
+    code.replace(/;\s*/g,";\n");
 
-    lines.forEach((line,i)=>{
-        for(let c of line){
-            if(c=="{")open++;
-            if(c=="}")open--;
+    /*
+    |--------------------------------------------------------------------------
+    | SPLIT LINES
+    |--------------------------------------------------------------------------
+    */
+
+    let lines =
+    code.split("\n");
+
+    let formatted = [];
+
+    let indent = 0;
+
+    lines.forEach(line=>{
+
+        line =
+        line.trim();
+
+        /*
+        |--------------------------------------------------------------------------
+        | SKIP EMPTY LINES
+        |--------------------------------------------------------------------------
+        */
+
+        if(line === ''){
+            return;
         }
-        if(open<0){
-            throw {message:"Unexpected closing brace",line:i+1};
+
+        /*
+        |--------------------------------------------------------------------------
+        | BEFORE }
+        |--------------------------------------------------------------------------
+        */
+
+        if(line.startsWith("}")){
+            indent--;
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | ADD LINE
+        |--------------------------------------------------------------------------
+        */
+
+        formatted.push(
+
+            "    ".repeat(
+                Math.max(indent,0)
+            ) +
+            line
+
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | AFTER {
+        |--------------------------------------------------------------------------
+        */
+
+        if(line.endsWith("{")){
+            indent++;
+        }
+
     });
 
-    if(open!==0){
-        throw {message:"Missing closing brace",line:lines.length};
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | FINAL OUTPUT
+    |--------------------------------------------------------------------------
+    */
 
-    const blocked=["system(","include(","require(","eval(","exec(","shell_exec"];
-    for(let w of blocked){
-        if(code.includes(w)){
-            throw {message:"Unauthorized keyword used",line:1};
-        }
-    }
+    editor.setValue(
+        formatted.join("\n")
+    );
 
-    if(type=="wait" && !code.includes("on wait")){
-        throw {message:"Wait script must contain 'on wait { }' block",line:1};
-    }
-
+    document
+    .getElementById("statusbar")
+    .innerHTML =
+    "Code formatted";
 }
+
+/*
+|--------------------------------------------------------------------------
+| SAVE
+|--------------------------------------------------------------------------
+*/
+
+function prepareSave(){
+
+    document
+    .getElementById("hiddenCode")
+    .value =
+    editor.getValue();
+
+    document
+    .getElementById("statusbar")
+    .innerHTML =
+    "Saving...";
+}
+
 </script>
+
 </body>
 </html>
